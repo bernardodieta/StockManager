@@ -4,6 +4,10 @@ Mini aplicación de gestión de inventario desarrollada con Django y Tailwind CS
 **By Bernardo Dieta**
 
 ---
+**VIDEO DE MUESTRA** Raiz del proyecto
+Video De muestra.mp4
+
+
 
 ## Requisitos
 
