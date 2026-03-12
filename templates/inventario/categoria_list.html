@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorías{% endblock title %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold">Categorías</h1>
+        <a href="{% url 'categoria_create' %}" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Nueva categoría</a>
+    </div>
+    <ul class="space-y-2">
+        {% for categoria in categorias %}
+            <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                <div>
+                    <p class="font-medium">{{ categoria.nombre }}</p>
+                    <p class="text-sm text-slate-500">Inventario: {{ categoria.inventario.nombre }}</p>
+                </div>
+                <div class="flex gap-3 text-sm">
+                    <a href="{% url 'categoria_update' categoria.pk %}" class="font-medium">Editar</a>
+                    <a href="{% url 'categoria_delete' categoria.pk %}" class="text-red-700 font-medium">Eliminar</a>
+                </div>
+            </li>
+        {% empty %}
+            <li class="text-slate-500">No hay categorías registradas.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}

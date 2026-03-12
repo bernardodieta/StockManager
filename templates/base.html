@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stock Manager{% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        body {
+            color: #0f172a;
+        }
+
+        form p {
+            margin-bottom: 1rem;
+        }
+
+        form p label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form input[type="email"],
+        form input[type="password"],
+        form input[type="date"],
+        form input[type="file"],
+        form select,
+        form textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            color: #0f172a;
+            padding: 0.625rem 0.75rem;
+        }
+
+        form input::placeholder,
+        form textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        form input[type="text"]:focus,
+        form input[type="number"]:focus,
+        form input[type="email"]:focus,
+        form input[type="password"]:focus,
+        form input[type="date"]:focus,
+        form input[type="file"]:focus,
+        form select:focus,
+        form textarea:focus {
+            outline: none;
+            border-color: #0f172a;
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.15);
+        }
+
+        form .helptext {
+            display: block;
+            margin-top: 0.35rem;
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        form .errorlist {
+            margin: 0.35rem 0 0;
+            padding: 0;
+            list-style: none;
+            color: #b91c1c;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-slate-900 text-white shadow">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div>
+                    <a href="{% url 'dashboard' %}" class="font-semibold text-lg leading-none">Stock Manager</a>
+                    <p class="text-xs text-slate-400 mt-0.5">By Bernardo Dieta</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    {% if user.is_authenticated %}
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span class="text-sm">{{ user.username }}</span>
+                            {% if user.is_superuser or user.profile.rol == 'admin' %}
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-amber-400 text-amber-900 font-medium leading-none mt-0.5">Admin</span>
+                            {% else %}
+                                <span class="text-xs px-1.5 py-0.5 rounded bg-slate-600 text-slate-200 font-medium leading-none mt-0.5">Empleado</span>
+                            {% endif %}
+                        </div>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="px-3 py-2 text-sm rounded bg-slate-700 hover:bg-slate-600">Salir</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="px-3 py-2 text-sm rounded bg-slate-700 hover:bg-slate-600">Ingresar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-1 max-w-7xl w-full mx-auto">
+            {% if user.is_authenticated %}
+                <aside class="w-64 hidden md:block bg-white border-r border-slate-200 p-4">
+                    <nav class="space-y-2">
+                        <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Dashboard</a>
+                        <a href="{% url 'producto_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Productos</a>
+                        <a href="{% url 'movimiento_salida' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Salida de stock</a>
+                        {% if user.profile.rol == 'admin' or user.is_superuser %}
+                            <a href="{% url 'movimiento_salida_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Historial de salidas</a>
+                            <a href="{% url 'inventario_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Inventarios</a>
+                            <a href="{% url 'categoria_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Categorías</a>
+                            <a href="{% url 'proveedor_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Proveedores</a>
+                            <a href="{% url 'users_list' %}" class="block px-3 py-2 rounded hover:bg-slate-100">Usuarios</a>
+                        {% endif %}
+                    </nav>
+                </aside>
+            {% endif %}
+
+            <main class="flex-1 p-4 md:p-6">
+                {% if messages %}
+                    <div class="space-y-2 mb-4">
+                        {% for message in messages %}
+                            <div class="px-4 py-3 rounded bg-emerald-100 text-emerald-900 text-sm">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block content %}{% endblock content %}
+            </main>
+        </div>
+        <footer class="bg-slate-900 text-slate-400 text-xs">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <span>&copy; {% now "Y" %} Stock Manager &mdash; By Bernardo Dieta</span>
+                <span>Todos los derechos reservados</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

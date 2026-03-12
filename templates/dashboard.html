@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-semibold text-slate-900">Panel principal</h1>
+        <p class="text-slate-500 mt-1 text-sm">Bienvenido, {{ user.username }}. Resumen general del sistema.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg shadow p-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Productos</p>
+                <p class="text-3xl font-semibold text-slate-900 mt-1">{{ total_productos }}</p>
+            </div>
+            <a href="{% url 'producto_list' %}" class="bg-slate-900 text-white rounded px-3 py-2 text-sm">Ver</a>
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Inventarios</p>
+                <p class="text-3xl font-semibold text-slate-900 mt-1">{{ total_inventarios }}</p>
+            </div>
+            {% if user.profile.rol == 'admin' or user.is_superuser %}
+                <a href="{% url 'inventario_list' %}" class="bg-slate-900 text-white rounded px-3 py-2 text-sm">Ver</a>
+            {% endif %}
+        </div>
+        <div class="bg-white rounded-lg shadow p-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Categorías</p>
+                <p class="text-3xl font-semibold text-slate-900 mt-1">{{ total_categorias }}</p>
+            </div>
+            {% if user.profile.rol == 'admin' or user.is_superuser %}
+                <a href="{% url 'categoria_list' %}" class="bg-slate-900 text-white rounded px-3 py-2 text-sm">Ver</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Acciones rápidas</h2>
+        </div>
+        <ul class="space-y-2">
+            <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                <div>
+                    <p class="font-medium">Productos</p>
+                    <p class="text-sm text-slate-500">Listado y gestión de productos.</p>
+                </div>
+                <a href="{% url 'producto_list' %}" class="text-sm font-medium">Ir</a>
+            </li>
+            <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                <div>
+                    <p class="font-medium">Registrar salida de stock</p>
+                    <p class="text-sm text-slate-500">Registrar una salida de producto.</p>
+                </div>
+                <a href="{% url 'movimiento_salida' %}" class="text-sm font-medium">Ir</a>
+            </li>
+            {% if user.profile.rol == 'admin' or user.is_superuser %}
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">Historial de salidas</p>
+                        <p class="text-sm text-slate-500">Revisión de movimientos registrados.</p>
+                    </div>
+                    <a href="{% url 'movimiento_salida_list' %}" class="text-sm font-medium">Ir</a>
+                </li>
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">Inventarios</p>
+                        <p class="text-sm text-slate-500">Crear y gestionar inventarios.</p>
+                    </div>
+                    <a href="{% url 'inventario_list' %}" class="text-sm font-medium">Ir</a>
+                </li>
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">Categorías</p>
+                        <p class="text-sm text-slate-500">Gestionar categorías de productos.</p>
+                    </div>
+                    <a href="{% url 'categoria_list' %}" class="text-sm font-medium">Ir</a>
+                </li>
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">Usuarios</p>
+                        <p class="text-sm text-slate-500">Gestionar usuarios del sistema.</p>
+                    </div>
+                    <a href="{% url 'users_list' %}" class="text-sm font-medium">Ir</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Últimos movimientos</h2>
+            {% if user.profile.rol == 'admin' or user.is_superuser %}
+                <a href="{% url 'movimiento_salida_list' %}" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Ver todos</a>
+            {% endif %}
+        </div>
+        <ul class="space-y-2">
+            {% for mov in ultimos_movimientos %}
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">{{ mov.producto.nombre }}</p>
+                        <p class="text-sm text-slate-500">{{ mov.get_tipo_display }} &middot; {{ mov.cantidad }} unidades &middot; {{ mov.usuario.username }}</p>
+                    </div>
+                    <span class="text-xs text-slate-400">{{ mov.creado_en|date:"d/m/Y" }}</span>
+                </li>
+            {% empty %}
+                <li class="text-slate-500 text-sm">No hay movimientos registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}

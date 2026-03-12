@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos{% endblock title %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-slate-900">Productos</h1>
+                <p class="text-slate-500 mt-1 text-sm">Listado completo de productos registrados.</p>
+            </div>
+            {% if user.profile.rol == 'admin' or user.is_superuser %}
+                <a href="{% url 'producto_create' %}" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Nuevo producto</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <ul class="space-y-2">
+            {% for producto in productos %}
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <a href="{% url 'producto_detail' producto.pk %}" class="font-medium hover:underline">{{ producto.nombre }}</a>
+                        <p class="text-sm text-slate-500 mt-0.5">
+                            {{ producto.inventario.nombre }} &middot; {{ producto.categoria.nombre }} &middot; Proveedor: {{ producto.proveedor }}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-sm shrink-0">
+                        <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 font-medium">{{ producto.stock }} uds.</span>
+                        <a href="{% url 'producto_detail' producto.pk %}" class="font-medium">Ver</a>
+                        {% if user.profile.rol == 'admin' or user.is_superuser %}
+                            <a href="{% url 'producto_update' producto.pk %}" class="font-medium">Editar</a>
+                            <a href="{% url 'producto_delete' producto.pk %}" class="text-red-700 font-medium">Eliminar</a>
+                        {% endif %}
+                    </div>
+                </li>
+            {% empty %}
+                <li class="text-slate-500 text-sm">No hay productos registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}

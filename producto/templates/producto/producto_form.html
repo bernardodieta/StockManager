@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Producto{% endblock title %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-semibold text-slate-900">{% if object %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
+        <p class="text-slate-500 mt-1 text-sm">Completa los datos para guardar el producto.</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}
+                    {% if field.html_name == 'proveedor' %}
+                        <span class="flex gap-2 items-center">
+                            {{ field }}
+                            <button type="button" onclick="document.getElementById('modal-proveedor').classList.remove('hidden')"
+                                class="shrink-0 bg-slate-900 text-white rounded px-3 py-1.5 text-xs">+ Añadir</button>
+                        </span>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                    {% for error in field.errors %}<ul class="errorlist"><li>{{ error }}</li></ul>{% endfor %}
+                </p>
+            {% endfor %}
+            <div class="pt-4 flex items-center gap-3">
+                <button type="submit" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Guardar</button>
+                <a href="{% url 'producto_list' %}" class="border border-slate-300 text-slate-700 rounded px-4 py-2 text-sm">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modal-proveedor" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Añadir proveedor</h2>
+        <div id="modal-error" class="hidden mb-3 px-3 py-2 rounded bg-red-50 text-red-700 text-sm"></div>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Nombre *</label>
+                <input id="prov-nombre" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Contacto</label>
+                <input id="prov-contacto" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Teléfono</label>
+                <input id="prov-telefono" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                <input id="prov-email" type="email" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+        </div>
+        <div class="mt-5 flex items-center gap-3">
+            <button type="button" onclick="guardarProveedor()" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Guardar</button>
+            <button type="button" onclick="cerrarModal()" class="border border-slate-300 text-slate-700 rounded px-4 py-2 text-sm">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function cerrarModal() {
+    document.getElementById('modal-proveedor').classList.add('hidden');
+    document.getElementById('modal-error').classList.add('hidden');
+    ['prov-nombre','prov-contacto','prov-telefono','prov-email'].forEach(id => document.getElementById(id).value = '');
+}
+
+function guardarProveedor() {
+    const data = new FormData();
+    data.append('nombre', document.getElementById('prov-nombre').value);
+    data.append('contacto', document.getElementById('prov-contacto').value);
+    data.append('telefono', document.getElementById('prov-telefono').value);
+    data.append('email', document.getElementById('prov-email').value);
+    data.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch('{% url "proveedor_quick_create" %}', { method: 'POST', body: data })
+        .then(r => r.json().then(json => ({ ok: r.ok, json })))
+        .then(({ ok, json }) => {
+            if (!ok) {
+                const msgs = Object.values(json.errors).flat().map(e => e.message).join(' ');
+                const err = document.getElementById('modal-error');
+                err.textContent = msgs;
+                err.classList.remove('hidden');
+                return;
+            }
+            const select = document.getElementById('id_proveedor');
+            const option = new Option(json.nombre, json.id, true, true);
+            select.appendChild(option);
+            cerrarModal();
+        });
+}
+</script>
+{% endblock content %}
+

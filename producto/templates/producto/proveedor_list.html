@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Proveedores{% endblock title %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-semibold text-slate-900">Proveedores</h1>
+                <p class="text-slate-500 mt-1 text-sm">Listado de proveedores registrados.</p>
+            </div>
+            <a href="{% url 'proveedor_create' %}" class="bg-slate-900 text-white rounded px-4 py-2 text-sm">Nuevo proveedor</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <ul class="space-y-2">
+            {% for proveedor in proveedores %}
+                <li class="border border-slate-200 rounded p-3 flex items-center justify-between">
+                    <div>
+                        <p class="font-medium">{{ proveedor.nombre }}</p>
+                        <p class="text-sm text-slate-500 mt-0.5">
+                            {% if proveedor.contacto %}{{ proveedor.contacto }}{% endif %}
+                            {% if proveedor.telefono %}&middot; {{ proveedor.telefono }}{% endif %}
+                            {% if proveedor.email %}&middot; {{ proveedor.email }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="flex gap-3 text-sm shrink-0">
+                        <a href="{% url 'proveedor_update' proveedor.pk %}" class="font-medium">Editar</a>
+                        <a href="{% url 'proveedor_delete' proveedor.pk %}" class="text-red-700 font-medium">Eliminar</a>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="text-slate-500 text-sm">No hay proveedores registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}

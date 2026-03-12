@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Ingresar{% endblock title %}
+
+{% block content %}
+<div class="w-full max-w-md mx-auto bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
+    <h1 class="text-2xl font-semibold text-slate-900">Iniciar sesión</h1>
+    <p class="text-sm text-slate-600 mt-1 mb-6">Ingresa con tu usuario para continuar.</p>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-lg px-4 py-2">Entrar</button>
+    </form>
+    <p class="text-sm text-slate-600 mt-5">¿No tienes cuenta? <a href="{% url 'registro' %}" class="text-slate-900 font-semibold">Regístrate</a></p>
+</div>
+{% endblock content %}
